@@ -1,4 +1,6 @@
-﻿using MetricsAgent.Models;
+﻿using AutoMapper;
+using MetricsAgent.Models;
+using MetricsAgent.Models.Dto;
 using MetricsAgent.Models.Requests;
 using MetricsAgent.Service;
 using Microsoft.AspNetCore.Mvc;
@@ -11,37 +13,40 @@ public class CpuMetricsController : Controller
 {
     private readonly ILogger<CpuMetricsController> _logger;
     private readonly ICpuMetricsRepository _cpuMetricsRepository;
+    private readonly IMapper _mapper;
 
-    public CpuMetricsController(ILogger<CpuMetricsController> logger, ICpuMetricsRepository cpuMetricsRepository)
+    public CpuMetricsController(ILogger<CpuMetricsController> logger, 
+                                ICpuMetricsRepository cpuMetricsRepository,
+                                IMapper mapper)
     {
         _logger = logger;
         _cpuMetricsRepository = cpuMetricsRepository;
+        _mapper = mapper;
     }
 
     [HttpPost("create")]
     public IActionResult Create([FromBody] CpuMetricCreateRequest request)
     {
-        _cpuMetricsRepository.Create(new CpuMetric
-        {
-            Value = request.Value,
-            Time = (int)request.Time.TotalSeconds
-        });
+        _cpuMetricsRepository.Create(_mapper.Map<CpuMetric>(request));
 
         _logger.LogInformation("Create cpu metrics call.");
         return Ok();
     }
 
     [HttpGet("from/{fromTime}/to/{toTime}")]
-    public ActionResult<IList<CpuMetric>> GetCpuMetrics([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
+    public ActionResult<IList<CpuMetricDto>> GetCpuMetrics([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
     {
         _logger.LogInformation("Get all cpu metrics call.");
-        return Ok(_cpuMetricsRepository.GetByTimePeriod(fromTime, toTime));
+        return Ok(_cpuMetricsRepository.GetByTimePeriod(fromTime, toTime)?
+            .Select(metric => _mapper.Map<CpuMetricDto>(metric)).ToList());
     }
 
     [HttpGet("from/{fromTime}/to/{toTime}/percentiles/{percentile}")]
-    public ActionResult<IList<CpuMetric>> GetCpuMetricsByPercentile([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime, [FromRoute] int percentile)
+    public ActionResult<IList<CpuMetricDto>> GetCpuMetricsByPercentile([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime, [FromRoute] int percentile)
     {
         _logger.LogInformation("Get all cpu metrics by percentile call.");
-        return Ok(_cpuMetricsRepository.GetByTimePeriod(fromTime, toTime).Where(x => x.Value >= percentile));
+        return Ok(_cpuMetricsRepository.GetByTimePeriod(fromTime, toTime)
+            .Where(x => x.Value >= percentile)
+            .Select(metric => _mapper.Map<CpuMetricDto>(metric)).ToList());
     }
 }

@@ -1,4 +1,6 @@
-﻿using MetricsAgent.Models;
+﻿using AutoMapper;
+using MetricsAgent.Models;
+using MetricsAgent.Models.Dto;
 using MetricsAgent.Models.Requests;
 using MetricsAgent.Service;
 using Microsoft.AspNetCore.Mvc;
@@ -11,30 +13,29 @@ public class HddMetricsController : Controller
 {
     private readonly ILogger<HddMetricsController> _logger;
     private readonly IHddMetricsRepository _hddMetricsRepository;
+    private readonly IMapper _mapper;
 
-    public HddMetricsController(ILogger<HddMetricsController> logger, IHddMetricsRepository hddMetricsRepository)
+    public HddMetricsController(ILogger<HddMetricsController> logger, IHddMetricsRepository hddMetricsRepository, IMapper mapper)
     {
         _logger = logger;
         _hddMetricsRepository = hddMetricsRepository;
+        _mapper = mapper;
     }
 
     [HttpPost("create")]
     public IActionResult Create([FromBody] HddMetricCreateRequest request)
     {
-        _hddMetricsRepository.Create(new HddMetric
-        {
-            Value = request.Value,
-            Time = (int)request.Time.TotalSeconds
-        });
+        _hddMetricsRepository.Create(_mapper.Map<HddMetric>(request));
 
         _logger.LogInformation("Create hdd metrics call.");
         return Ok();
     }
 
-    [HttpGet("left")]
-    public ActionResult<IList<HddMetric>> GetHddMetrics([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
+    [HttpGet("left/from/{fromTime}/to/{toTime}")]
+    public ActionResult<IList<HddMetricDto>> GetHddMetrics([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
     {
         _logger.LogInformation("Get all hdd metrics call.");
-        return Ok(_hddMetricsRepository.GetByTimePeriod(fromTime, toTime));
+        return Ok(_hddMetricsRepository.GetByTimePeriod(fromTime, toTime)?
+            .Select(metric => _mapper.Map<HddMetricDto>(metric)).ToList());
     }
 }
