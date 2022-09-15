@@ -2,6 +2,7 @@
 using MetricsAgent.Models;
 using MetricsAgent.Models.Dto;
 using MetricsAgent.Models.Requests;
+using MetricsAgent.Models.Response;
 using MetricsAgent.Service;
 using Microsoft.AspNetCore.Mvc;
 
@@ -31,18 +32,23 @@ public class RamMetricsController : Controller
         return Ok();
     }
     [HttpGet("all")]
-    public ActionResult<IList<RamMetricDto>> GetAllMetrics()
+    public ActionResult<AllRamMetricsApiResponse> GetAllMetrics()
     {
         _logger.LogInformation("Get all ram metrics call. (Internal method.)");
-        return Ok(_ramMetricsRepository.GetAll()?
-            .Select(metric => _mapper.Map<RamMetricDto>(metric)).ToList());
+        return Ok(new AllRamMetricsApiResponse { 
+            Metrics = _ramMetricsRepository.GetAll()
+            .Select(metric => _mapper.Map<RamMetricDto>(metric)).ToList()
+        });
     }
 
     [HttpGet("available/from/{fromTime}/to/{toTime}")]
-    public ActionResult<IList<RamMetricDto>> GetRamMetrics([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
+    public ActionResult<AllRamMetricsApiResponse> GetRamMetrics([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
     {
         _logger.LogInformation("Get all ram metrics call.");
-        return Ok(_ramMetricsRepository.GetByTimePeriod(fromTime, toTime)?
-            .Select(metric => _mapper.Map<RamMetricDto>(metric)).ToList());
+        return Ok(new AllRamMetricsApiResponse
+        {
+            Metrics = _ramMetricsRepository.GetByTimePeriod(fromTime, toTime)
+            .Select(metric => _mapper.Map<RamMetricDto>(metric)).ToList()
+        });
     }
 }

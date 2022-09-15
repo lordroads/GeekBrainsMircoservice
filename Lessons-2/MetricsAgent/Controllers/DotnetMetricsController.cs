@@ -2,6 +2,7 @@
 using MetricsAgent.Models;
 using MetricsAgent.Models.Dto;
 using MetricsAgent.Models.Requests;
+using MetricsAgent.Models.Response;
 using MetricsAgent.Service;
 using Microsoft.AspNetCore.Mvc;
 
@@ -32,18 +33,23 @@ public class DotnetMetricsController : Controller
     }
 
     [HttpGet("all")]
-    public ActionResult<IList<DotnetMetricDto>> GetAllMetrics()
+    public ActionResult<AllDotnetMetricsApiResponse> GetAllMetrics()
     {
         _logger.LogInformation("Get all dotnet metrics call. (Internal method.)");
-        return Ok(_dotnetMetricsRepository.GetAll()?
-            .Select(metric => _mapper.Map<DotnetMetricDto>(metric)).ToList());
+        return Ok(new AllDotnetMetricsApiResponse { 
+            Metrics = _dotnetMetricsRepository.GetAll()
+            .Select(metric => _mapper.Map<DotnetMetricDto>(metric)).ToList()
+        });
     }
 
     [HttpGet("errors-count/from/{fromTime}/to/{toTime}")]
-    public ActionResult<IList<DotnetMetricDto>> GetDotnetMetrics([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
+    public ActionResult<AllDotnetMetricsApiResponse> GetDotnetMetrics([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
     {
         _logger.LogInformation("Get all dotnet metrics call.");
-        return Ok(_dotnetMetricsRepository.GetByTimePeriod(fromTime, toTime)?
-            .Select(metric => _mapper.Map<DotnetMetricDto>(metric)).ToList());
+        return Ok(new AllDotnetMetricsApiResponse
+        {
+            Metrics = _dotnetMetricsRepository.GetByTimePeriod(fromTime, toTime)
+            .Select(metric => _mapper.Map<DotnetMetricDto>(metric)).ToList()
+        });
     }
 }

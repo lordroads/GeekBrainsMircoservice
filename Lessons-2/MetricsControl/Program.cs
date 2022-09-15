@@ -1,14 +1,76 @@
+using FluentMigrator.Runner;
 using MetricsControl.Converters;
 using MetricsControl.Models;
+using MetricsControl.Service;
+using MetricsControl.Service.Client;
+using MetricsControl.Service.Client.Implementations;
+using MetricsControl.Service.Implementations;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using NLog.Web;
+using Polly;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddSingleton<AgentPool>();
+
+#region Configure Service Singleton
+
+//Переделано на БД SQLite
+//builder.Services.AddSingleton<AgentPool>();
+
+#endregion
+
+#region Configure Client with Polly
+
+builder.Services.AddHttpClient<IMetricsAgentClient, MetricsAgentClient>()
+                .AddTransientHttpErrorPolicy(p =>
+                p.WaitAndRetryAsync(
+                    retryCount: 3, 
+                    sleepDurationProvider: (attemptCount) => TimeSpan.FromSeconds(attemptCount * 2), 
+                    onRetry: (response, sleepDuration, attemptCount, context) => {
+                        var logger = builder.Services.BuildServiceProvider().GetService<ILogger<Program>>();
+                        logger.LogError(response.Exception != null ? response.Exception : 
+                            new Exception($"\n{response.Result.StatusCode}: {response.Result.RequestMessage}"), $"(attempt: {attemptCount}) request exception.");
+                    }));
+
+#endregion
+
+#region Configure Options
+
+builder.Services.Configure<DatabaseOptions>(options =>
+{
+    builder.Configuration.GetSection("Settings:DatabaseOptions").Bind(options);
+});
+
+#endregion
+
+#region Configure Repository
+
+builder.Services.AddScoped<IAgentRepository, AgentsRepository>();
+
+#endregion
+
+#region Configure DataBase
+
+builder.Services.AddFluentMigratorCore()
+    .ConfigureRunner(rb =>
+        rb.AddSQLite()
+            .WithGlobalConnectionString(builder.Configuration["Settings:DatabaseOptions:ConnectionString"])
+            .ScanIn(typeof(Program).Assembly).For.Migrations())
+        .AddLogging(lb => lb.AddFluentMigratorConsole());
+
+#endregion
+
+#region Configure Automapper
+
+//var mapperConfiguration = new MapperConfiguration(mapper => mapper.AddProfile(new MapperProfile()));
+//var mapper = mapperConfiguration.CreateMapper();
+//builder.Services.AddSingleton(mapper);
+
+#endregion
+
 
 #region Configure Logging
 
@@ -57,6 +119,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseAuthorization();
 app.UseHttpLogging();
+
+var serviesScopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
+using (IServiceScope serviceScope = serviesScopeFactory.CreateScope())
+{
+    var migrationRunner = serviceScope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+    migrationRunner.MigrateUp();
+}
 
 app.MapControllers();
 

@@ -17,9 +17,9 @@ public class AgentPool
 
     public void Add(AgentInfo agent)
     {
-        if (!_agents.ContainsKey(agent.AgentId))
+        if (!_agents.ContainsKey(agent.Id))
         {
-            _agents.Add(agent.AgentId, agent);
+            _agents.Add(agent.Id, agent);
         }
     }
 
