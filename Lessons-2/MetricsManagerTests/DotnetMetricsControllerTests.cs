@@ -20,7 +20,7 @@ public class DotnetMetricsControllerTests
         TimeSpan fromTime = TimeSpan.FromSeconds(0);
         TimeSpan toTime = TimeSpan.FromSeconds(100);
 
-        var result = _dotnetMetricsController.GetMetricsFromAgent(agentId, fromTime, toTime);
+        var result = _dotnetMetricsController.GetDotnetMetricsFromAgent(agentId, fromTime, toTime);
 
         Assert.IsAssignableFrom<IActionResult>(result);
     }
@@ -31,7 +31,7 @@ public class DotnetMetricsControllerTests
         TimeSpan fromTime = TimeSpan.FromSeconds(0);
         TimeSpan toTime = TimeSpan.FromSeconds(100);
 
-        var result = _dotnetMetricsController.GetCountErrorsFromAll(fromTime, toTime);
+        var result = _dotnetMetricsController.GetDotnetCountErrorsFromAll(fromTime, toTime);
 
         Assert.IsAssignableFrom<IActionResult>(result);
     }

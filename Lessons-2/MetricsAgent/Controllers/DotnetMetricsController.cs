@@ -36,20 +36,15 @@ public class DotnetMetricsController : Controller
     public ActionResult<AllDotnetMetricsApiResponse> GetAllMetrics()
     {
         _logger.LogInformation("Get all dotnet metrics call. (Internal method.)");
-        return Ok(new AllDotnetMetricsApiResponse { 
-            Metrics = _dotnetMetricsRepository.GetAll()
-            .Select(metric => _mapper.Map<DotnetMetricDto>(metric)).ToList()
-        });
+        return Ok(_mapper.Map<AllDotnetMetricsApiResponse>(_dotnetMetricsRepository.GetAll()
+            .Select(metric => _mapper.Map<DotnetMetricDto>(metric)).ToList()));
     }
 
     [HttpGet("errors-count/from/{fromTime}/to/{toTime}")]
     public ActionResult<AllDotnetMetricsApiResponse> GetDotnetMetrics([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
     {
         _logger.LogInformation("Get all dotnet metrics call.");
-        return Ok(new AllDotnetMetricsApiResponse
-        {
-            Metrics = _dotnetMetricsRepository.GetByTimePeriod(fromTime, toTime)
-            .Select(metric => _mapper.Map<DotnetMetricDto>(metric)).ToList()
-        });
+        return Ok(_mapper.Map<AllDotnetMetricsApiResponse>(_dotnetMetricsRepository.GetByTimePeriod(fromTime, toTime)
+            .Select(metric => _mapper.Map<DotnetMetricDto>(metric)).ToList()));
     }
 }

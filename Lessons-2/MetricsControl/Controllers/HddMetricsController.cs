@@ -22,8 +22,8 @@ public class HddMetricsController : Controller
         _agentRepository = agentRepository;
     }
 
-    [HttpGet("agent/{agentId}/from/{fromTime}/to/{toTime}")]
-    public ActionResult<AllHddMetricsApiResponse> GetMetricsFromAgent([FromRoute] int agentId, [FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
+    [HttpGet("get-all-by-id")]
+    public ActionResult<AllHddMetricsApiResponse> GetHddMetricsFromAgent([FromQuery] int agentId, [FromQuery] TimeSpan fromTime, [FromQuery] TimeSpan toTime)
     {
         AgentInfo agent = _agentRepository.Get(agentId);
 
@@ -51,8 +51,8 @@ public class HddMetricsController : Controller
         return Ok(metrics);
     }
 
-    [HttpGet("from/{fromTime}/to/{toTime}")]
-    public ActionResult<IList<AllHddMetricsApiResponse>> GetMetricsFromAll([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
+    [HttpGet("get-all")]
+    public ActionResult<IList<AllHddMetricsApiResponse>> GetHddMetricsFromAll([FromQuery] TimeSpan fromTime, [FromQuery] TimeSpan toTime)
     {
         _logger.LogInformation($"(HDD)  starting new request to metrics agent all");
 

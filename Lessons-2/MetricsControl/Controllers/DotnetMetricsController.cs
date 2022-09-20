@@ -22,8 +22,8 @@ public class DotnetMetricsController : Controller
         _agentRepository = agentRepository;
     }
 
-    [HttpGet("agent/{agentId}/from/{fromTime}/to/{toTime}")]
-    public ActionResult<AllDotnetMetricsApiResponse> GetMetricsFromAgent([FromRoute] int agentId, [FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
+    [HttpGet("get-all-by-id")]
+    public ActionResult<AllDotnetMetricsApiResponse> GetDotnetMetricsFromAgent([FromQuery] int agentId, [FromQuery] TimeSpan fromTime, [FromQuery] TimeSpan toTime)
     {
 
         AgentInfo agent = _agentRepository.Get(agentId);
@@ -52,8 +52,8 @@ public class DotnetMetricsController : Controller
         return Ok(metrics);
     }
 
-    [HttpGet("all/from/{fromTime}/to/{toTime}")]
-    public ActionResult<IList<AllDotnetMetricsApiResponse>> GetCountErrorsFromAll([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
+    [HttpGet("get-all")]
+    public ActionResult<IList<AllDotnetMetricsApiResponse>> GetDotnetCountErrorsFromAll([FromQuery] TimeSpan fromTime, [FromQuery] TimeSpan toTime)
     {
         _logger.LogInformation($"(DotNet)  starting new request to metrics agent all");
 

@@ -22,8 +22,8 @@ public class RamMetricsController : Controller
         _agentRepository = agentRepository;
     }
 
-    [HttpGet("agent/{agentId}/from/{fromTime}/to/{toTime}")]
-    public ActionResult<AllRamMetricsApiResponse> GetMetricsFromAgent([FromRoute] int agentId, [FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
+    [HttpGet("get-all-by-id")]
+    public ActionResult<AllRamMetricsApiResponse> GetRamMetricsFromAgent([FromQuery] int agentId, [FromQuery] TimeSpan fromTime, [FromQuery] TimeSpan toTime)
     {
         AgentInfo agent = _agentRepository.Get(agentId);
 
@@ -51,8 +51,8 @@ public class RamMetricsController : Controller
         return Ok(metrics);
     }
 
-    [HttpGet("available/from/{fromTime}/to/{toTime}")]
-    public ActionResult<IList<AllRamMetricsApiResponse>> GetMetricsFromAll([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
+    [HttpGet("get-all")]
+    public ActionResult<IList<AllRamMetricsApiResponse>> GetRamMetricsFromAll([FromQuery] TimeSpan fromTime, [FromQuery] TimeSpan toTime)
     {
         _logger.LogInformation($"(RAM)  starting new request to metrics agent all");
 

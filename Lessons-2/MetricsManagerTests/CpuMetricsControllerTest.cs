@@ -19,7 +19,7 @@ public class CpuMetricsControllerTest
         TimeSpan fromTime = TimeSpan.FromSeconds(0);
         TimeSpan toTime = TimeSpan.FromSeconds(100);
 
-        var result = _cpuMetricsController.GetMetricsFromAll(fromTime, toTime);
+        var result = _cpuMetricsController.GetCpuMetricsFromAll(fromTime, toTime);
 
         Assert.IsAssignableFrom<IActionResult>(result);
     }
@@ -31,7 +31,7 @@ public class CpuMetricsControllerTest
         TimeSpan fromTime = TimeSpan.FromSeconds(0);
         TimeSpan toTime = TimeSpan.FromSeconds(100);
 
-        var result = _cpuMetricsController.GetMetricsFromAgent(agentId, fromTime, toTime);
+        var result = _cpuMetricsController.GetCpuMetricsFromAgent(agentId, fromTime, toTime);
 
         Assert.IsAssignableFrom<IActionResult>(result);
     }
@@ -43,7 +43,7 @@ public class CpuMetricsControllerTest
         TimeSpan fromTime = TimeSpan.FromSeconds(0);
         TimeSpan toTime = TimeSpan.FromSeconds(100);
 
-        var result = _cpuMetricsController.GetMetricsFromAllByPercentile(fromTime, toTime, percentile);
+        var result = _cpuMetricsController.GetCpuMetricsFromAllByPercentile(fromTime, toTime, percentile);
 
         Assert.IsAssignableFrom<IActionResult>(result);
     }

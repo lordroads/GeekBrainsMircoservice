@@ -58,8 +58,8 @@ public class NetworkMetricsRepository : INetworkMetricsRepository
 
         return connection.Query<NetworkMetric>("SELECT * FROM networkmetrics WHERE time >= @fromTime and time <= @toTime", new
         {
-            fromTime = fromTime,
-            toTime = toTime
+            fromTime = fromTime.TotalSeconds,
+            toTime = toTime.TotalSeconds
         }).ToList();
     }
 

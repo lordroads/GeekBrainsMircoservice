@@ -20,7 +20,7 @@ public class NetworkMetricsControllerTests
         TimeSpan fromTime = TimeSpan.FromSeconds(0);
         TimeSpan toTime = TimeSpan.FromSeconds(100);
 
-        var result = _networkMetricsController.GetMetricsFromAgent(agentId, fromTime, toTime);
+        var result = _networkMetricsController.GetNetworkMetricsFromAgent(agentId, fromTime, toTime);
 
         Assert.IsAssignableFrom<IActionResult>(result);
     }
@@ -31,7 +31,7 @@ public class NetworkMetricsControllerTests
         TimeSpan fromTime = TimeSpan.FromSeconds(0);
         TimeSpan toTime = TimeSpan.FromSeconds(100);
 
-        var result = _networkMetricsController.GetMetricsFromAll(fromTime, toTime);
+        var result = _networkMetricsController.GetNetworkMetricsFromAll(fromTime, toTime);
 
         Assert.IsAssignableFrom<IActionResult>(result);
     }
