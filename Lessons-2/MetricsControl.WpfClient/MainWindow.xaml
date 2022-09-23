@@ -1,0 +1,17 @@
+﻿<Window x:Class="MetricsControl.WpfClient.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MetricsControl.WpfClient"
+        mc:Ignorable="d"
+        Title="Metrics Control" Height="680" Width="936" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen" Background="#FFD3F39C">
+    <Grid Margin="10,10,10,15">
+        <local:CpuMetricControl HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="300" Width="282"/>
+        <local:DotnetMetricControl HorizontalAlignment="Left" Margin="316,10,0,0" VerticalAlignment="Top" Height="300" Width="282"/>
+        <local:HddMetricControl HorizontalAlignment="Left" Margin="624,10,0,0" VerticalAlignment="Top" Height="300" Width="282"/>
+        <local:NetworkMetricControl HorizontalAlignment="Left" Margin="164,331,0,0" VerticalAlignment="Top" Height="300" Width="282"/>
+        <local:RamMetricControl HorizontalAlignment="Left" Margin="475,331,0,0" VerticalAlignment="Top" Height="300" Width="282"/>
+
+    </Grid>
+</Window>
