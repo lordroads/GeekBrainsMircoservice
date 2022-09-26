@@ -31,6 +31,14 @@ public class HddMetricsController : Controller
         return Ok();
     }
 
+    [HttpGet("all")]
+    public ActionResult<IList<HddMetricDto>> GetAllMetrics()
+    {
+        _logger.LogInformation("Get all hdd metrics call. (Internal method.)");
+        return Ok(_hddMetricsRepository.GetAll()?
+            .Select(metric => _mapper.Map<HddMetricDto>(metric)).ToList());
+    }
+
     [HttpGet("left/from/{fromTime}/to/{toTime}")]
     public ActionResult<IList<HddMetricDto>> GetHddMetrics([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
     {

@@ -30,6 +30,13 @@ public class RamMetricsController : Controller
         _logger.LogInformation("Create ram metrics call.");
         return Ok();
     }
+    [HttpGet("all")]
+    public ActionResult<IList<RamMetricDto>> GetAllMetrics()
+    {
+        _logger.LogInformation("Get all ram metrics call. (Internal method.)");
+        return Ok(_ramMetricsRepository.GetAll()?
+            .Select(metric => _mapper.Map<RamMetricDto>(metric)).ToList());
+    }
 
     [HttpGet("available/from/{fromTime}/to/{toTime}")]
     public ActionResult<IList<RamMetricDto>> GetRamMetrics([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)

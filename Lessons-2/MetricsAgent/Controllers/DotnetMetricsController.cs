@@ -31,6 +31,14 @@ public class DotnetMetricsController : Controller
         return Ok();
     }
 
+    [HttpGet("all")]
+    public ActionResult<IList<DotnetMetricDto>> GetAllMetrics()
+    {
+        _logger.LogInformation("Get all dotnet metrics call. (Internal method.)");
+        return Ok(_dotnetMetricsRepository.GetAll()?
+            .Select(metric => _mapper.Map<DotnetMetricDto>(metric)).ToList());
+    }
+
     [HttpGet("errors-count/from/{fromTime}/to/{toTime}")]
     public ActionResult<IList<DotnetMetricDto>> GetDotnetMetrics([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
     {

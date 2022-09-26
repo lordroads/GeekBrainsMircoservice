@@ -33,6 +33,14 @@ public class CpuMetricsController : Controller
         return Ok();
     }
 
+    [HttpGet("all")]
+    public ActionResult<IList<CpuMetricDto>> GetAllMetrics()
+    {
+        _logger.LogInformation("Get all cpu metrics call. (Internal method.)");
+        return Ok(_cpuMetricsRepository.GetAll()?
+            .Select(metric => _mapper.Map<CpuMetricDto>(metric)).ToList());
+    }
+
     [HttpGet("from/{fromTime}/to/{toTime}")]
     public ActionResult<IList<CpuMetricDto>> GetCpuMetrics([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
     {
