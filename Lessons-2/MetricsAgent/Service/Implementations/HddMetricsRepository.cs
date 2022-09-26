@@ -1,147 +1,76 @@
 ﻿using MetricsAgent.Models;
+using Microsoft.Extensions.Options;
 using System.Data.SQLite;
+using Dapper;
 
 namespace MetricsAgent.Service.Implementations;
 
 public class HddMetricsRepository : IHddMetricsRepository
 {
-    private const string connectionString = "Data Source = metrics.db; Version = 3; Pooling = true; Max Pool Size = 100; ";
+    private readonly IOptions<DatabaseOptions> _databaseOptions;
+
+    public HddMetricsRepository(IOptions<DatabaseOptions> databaseOptions)
+    {
+        _databaseOptions = databaseOptions;
+    }
 
     public void Create(HddMetric item)
     {
-        using var connection = new SQLiteConnection(connectionString);
-        connection.Open();
-        using (var command = new SQLiteCommand(connection))
+        using var connection = new SQLiteConnection(_databaseOptions.Value.ConnectionString);
+
+        connection.Execute("INSERT INTO hddmetrics(value, time) VALUES(@value, @time)", new
         {
-            command.CommandText = "INSERT INTO hddmetrics(value, time) VALUES(@value, @time)";
-
-            command.Parameters.AddWithValue("@value", item.Value);
-            command.Parameters.AddWithValue("@time", item.Time);
-
-            command.Prepare();
-            command.ExecuteNonQuery();
-        }
+            value = item.Value,
+            time = item.Time
+        });
     }
 
     public void Delete(int id)
     {
-        using var connection = new SQLiteConnection(connectionString);
-        connection.Open();
+        using var connection = new SQLiteConnection(_databaseOptions.Value.ConnectionString);
 
-        using (var command = new SQLiteCommand(connection))
+        connection.Execute("DELETE FROM hddmetrics WHERE id=@id", new
         {
-            command.CommandText = "DELETE FROM hddmetrics WHERE id=@id";
-
-            command.Parameters.AddWithValue("@id", id);
-
-            command.Prepare();
-            command.ExecuteNonQuery();
-        }
-
+            id = id
+        });
     }
 
     public HddMetric Get(int id)
     {
-        using var connection = new SQLiteConnection(connectionString);
-        connection.Open();
-
-        using (var command = new SQLiteCommand(connection))
+        using var connection = new SQLiteConnection(_databaseOptions.Value.ConnectionString);
+        return connection.QuerySingle<HddMetric>("SELECT * FROM hddmetrics WHERE id=@id", new
         {
-            command.CommandText = "SELECT * FROM hddmetrics WHERE id=@id";
-            command.Parameters.AddWithValue("@id", id);
-
-            using (SQLiteDataReader reader = command.ExecuteReader())
-            {
-                if (reader.Read())
-                {
-                    return new HddMetric
-                    {
-                        Id = reader.GetInt32(0),
-                        Value = reader.GetInt32(1),
-                        Time = reader.GetInt32(2)
-                    };
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
+            id = id
+        });
     }
 
     public IList<HddMetric> GetAll()
     {
-        var returnList = new List<HddMetric>();
+        using var connection = new SQLiteConnection(_databaseOptions.Value.ConnectionString);
 
-        using var connection = new SQLiteConnection(connectionString);
-        connection.Open();
-
-        using (var command = new SQLiteCommand(connection))
-        {
-            command.CommandText = "SELECT * FROM hddmetrics";
-
-            using (SQLiteDataReader reader = command.ExecuteReader())
-            {
-                while (reader.Read())
-                {
-                    returnList.Add(new HddMetric
-                    {
-                        Id = reader.GetInt32(0),
-                        Value = reader.GetInt32(1),
-                        Time = reader.GetInt32(2)
-                    });
-                }
-            }
-        }
-
-        return returnList;
+        return connection.Query<HddMetric>("SELECT * FROM hddmetrics").ToList();
     }
 
     public IList<HddMetric> GetByTimePeriod(TimeSpan fromTime, TimeSpan toTime)
     {
-        var returnList = new List<HddMetric>();
+        using var connection = new SQLiteConnection(_databaseOptions.Value.ConnectionString);
 
-        using var connection = new SQLiteConnection(connectionString);
-        connection.Open();
-
-        using (var command = new SQLiteCommand(connection))
+        return connection.Query<HddMetric>("SELECT * FROM hddmetrics WHERE time >= @fromTime and time <= @toTime", new
         {
-            command.CommandText = "SELECT * FROM hddmetrics WHERE time >= @fromTime and time <= @toTime";
-            command.Parameters.AddWithValue("@fromTime", fromTime.TotalSeconds);
-            command.Parameters.AddWithValue("@toTime", toTime.TotalSeconds);
-
-            using (SQLiteDataReader reader = command.ExecuteReader())
-            {
-                while (reader.Read())
-                {
-                    returnList.Add(new HddMetric
-                    {
-                        Id = reader.GetInt32(0),
-                        Value = reader.GetInt32(1),
-                        Time = reader.GetInt32(2)
-                    });
-                }
-            }
-        }
-
-        return returnList;
+            fromTime = fromTime,
+            toTime = toTime
+        }).ToList();
     }
 
     public void Update(HddMetric item)
     {
-        using var connection = new SQLiteConnection(connectionString);
-        connection.Open();
+        using var connection = new SQLiteConnection(_databaseOptions.Value.ConnectionString);
 
-        using (var command = new SQLiteCommand(connection))
+        connection.Execute("UPDATE hddmetrics SET value = @value, time =@time WHERE id = @id; ", new
         {
-            command.CommandText = "UPDATE hddmetrics SET value = @value, time =@time WHERE id = @id; ";
-
-            command.Parameters.AddWithValue("@id", item.Id);
-            command.Parameters.AddWithValue("@value", item.Value);
-            command.Parameters.AddWithValue("@time", item.Time);
-
-            command.Prepare();
-            command.ExecuteNonQuery();
-        }
+            id = item.Id,
+            value = item.Value,
+            time = item.Time
+        });
     }
 }

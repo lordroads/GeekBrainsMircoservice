@@ -1,5 +1,7 @@
-﻿using MetricsAgent.Controllers;
+﻿using AutoMapper;
+using MetricsAgent.Controllers;
 using MetricsAgent.Models;
+using MetricsAgent.Models.Dto;
 using MetricsAgent.Models.Requests;
 using MetricsAgent.Service;
 using Microsoft.AspNetCore.Mvc;
@@ -16,13 +18,15 @@ public class CpuMetricsControllerTests
     private CpuMetricsController _cpuMetricsController;
     private Mock<ICpuMetricsRepository> _mockCpuMetricsRepository;
     private Mock<ILogger<CpuMetricsController>> _mockLogger;
+    private Mock<IMapper> _mockMapper;
 
     public CpuMetricsControllerTests()
     {
         _mockCpuMetricsRepository = new Mock<ICpuMetricsRepository>();
         _mockLogger = new Mock<ILogger<CpuMetricsController>>();
+        _mockMapper = new Mock<IMapper>();
 
-        _cpuMetricsController = new CpuMetricsController(_mockLogger.Object, _mockCpuMetricsRepository.Object);
+        _cpuMetricsController = new CpuMetricsController(_mockLogger.Object, _mockCpuMetricsRepository.Object, _mockMapper.Object);
     }
 
     [Fact]
@@ -33,7 +37,7 @@ public class CpuMetricsControllerTests
 
         var result = _cpuMetricsController.GetCpuMetrics(fromTime, toTime);
 
-        Assert.IsAssignableFrom<ActionResult<IList<CpuMetric>>>(result);
+        Assert.IsAssignableFrom<ActionResult<IList<CpuMetricDto>>>(result);
     }
 
     [Fact]

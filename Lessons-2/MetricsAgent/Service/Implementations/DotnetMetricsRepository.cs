@@ -1,147 +1,77 @@
 ﻿using MetricsAgent.Models;
 using System.Data.SQLite;
+using Dapper;
+using Microsoft.Extensions.Options;
 
 namespace MetricsAgent.Service.Implementations;
 
 public class DotnetMetricsRepository : IDotnetMetricsRepository
 {
-    private const string connectionString = "Data Source = metrics.db; Version = 3; Pooling = true; Max Pool Size = 100; ";
+    private readonly IOptions<DatabaseOptions> _databaseOptions;
+
+    public DotnetMetricsRepository(IOptions<DatabaseOptions> databaseOptions)
+    {
+        _databaseOptions = databaseOptions;
+    }
 
     public void Create(DotnetMetric item)
     {
-        using var connection = new SQLiteConnection(connectionString);
-        connection.Open();
-        using (var command = new SQLiteCommand(connection))
+        using var connection = new SQLiteConnection(_databaseOptions.Value.ConnectionString);
+
+        connection.Execute("INSERT INTO dotnetmetrics(value, time) VALUES(@value, @time)", new
         {
-            command.CommandText = "INSERT INTO dotnetmetrics(value, time) VALUES(@value, @time)";
-
-            command.Parameters.AddWithValue("@value", item.Value);
-            command.Parameters.AddWithValue("@time", item.Time);
-
-            command.Prepare();
-            command.ExecuteNonQuery();
-        }
+            value = item.Value,
+            time = item.Time
+        });
     }
 
     public void Delete(int id)
     {
-        using var connection = new SQLiteConnection(connectionString);
-        connection.Open();
+        using var connection = new SQLiteConnection(_databaseOptions.Value.ConnectionString);
 
-        using (var command = new SQLiteCommand(connection))
+        connection.Execute("DELETE FROM dotnetmetrics WHERE id=@id", new
         {
-            command.CommandText = "DELETE FROM dotnetmetrics WHERE id=@id";
-
-            command.Parameters.AddWithValue("@id", id);
-
-            command.Prepare();
-            command.ExecuteNonQuery();
-        }
-
+            id = id
+        });
     }
 
     public DotnetMetric Get(int id)
     {
-        using var connection = new SQLiteConnection(connectionString);
-        connection.Open();
+        using var connection = new SQLiteConnection(_databaseOptions.Value.ConnectionString);
 
-        using (var command = new SQLiteCommand(connection))
+        return connection.QuerySingle<DotnetMetric>("SELECT * FROM dotnetmetrics WHERE id=@id", new
         {
-            command.CommandText = "SELECT * FROM dotnetmetrics WHERE id=@id";
-            command.Parameters.AddWithValue("@id", id);
-
-            using (SQLiteDataReader reader = command.ExecuteReader())
-            {
-                if (reader.Read())
-                {
-                    return new DotnetMetric
-                    {
-                        Id = reader.GetInt32(0),
-                        Value = reader.GetInt32(1),
-                        Time = reader.GetInt32(2)
-                    };
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
+            id = id
+        });
     }
 
     public IList<DotnetMetric> GetAll()
     {
-        var returnList = new List<DotnetMetric>();
+        using var connection = new SQLiteConnection(_databaseOptions.Value.ConnectionString);
 
-        using var connection = new SQLiteConnection(connectionString);
-        connection.Open();
-
-        using (var command = new SQLiteCommand(connection))
-        {
-            command.CommandText = "SELECT * FROM dotnetmetrics";
-
-            using (SQLiteDataReader reader = command.ExecuteReader())
-            {
-                while (reader.Read())
-                {
-                    returnList.Add(new DotnetMetric
-                    {
-                        Id = reader.GetInt32(0),
-                        Value = reader.GetInt32(1),
-                        Time = reader.GetInt32(2)
-                    });
-                }
-            }
-        }
-
-        return returnList;
+        return connection.Query<DotnetMetric>("SELECT * FROM dotnetmetrics").ToList();
     }
 
     public IList<DotnetMetric> GetByTimePeriod(TimeSpan fromTime, TimeSpan toTime)
     {
-        var returnList = new List<DotnetMetric>();
+        using var connection = new SQLiteConnection(_databaseOptions.Value.ConnectionString);
 
-        using var connection = new SQLiteConnection(connectionString);
-        connection.Open();
-
-        using (var command = new SQLiteCommand(connection))
+        return connection.Query<DotnetMetric>("SELECT * FROM dotnetmetrics WHERE time >= @fromTime and time <= @toTime", new
         {
-            command.CommandText = "SELECT * FROM dotnetmetrics WHERE time >= @fromTime and time <= @toTime";
-            command.Parameters.AddWithValue("@fromTime", fromTime.TotalSeconds);
-            command.Parameters.AddWithValue("@toTime", toTime.TotalSeconds);
-
-            using (SQLiteDataReader reader = command.ExecuteReader())
-            {
-                while (reader.Read())
-                {
-                    returnList.Add(new DotnetMetric
-                    {
-                        Id = reader.GetInt32(0),
-                        Value = reader.GetInt32(1),
-                        Time = reader.GetInt32(2)
-                    });
-                }
-            }
-        }
-
-        return returnList;
+            fromTime = fromTime.TotalSeconds,
+            toTime = toTime.TotalSeconds
+        }).ToList();
     }
 
     public void Update(DotnetMetric item)
     {
-        using var connection = new SQLiteConnection(connectionString);
-        connection.Open();
+        using var connection = new SQLiteConnection(_databaseOptions.Value.ConnectionString);
 
-        using (var command = new SQLiteCommand(connection))
+        connection.Execute("UPDATE dotnetmetrics SET value = @value, time =@time WHERE id = @id; ", new
         {
-            command.CommandText = "UPDATE dotnetmetrics SET value = @value, time =@time WHERE id = @id; ";
-
-            command.Parameters.AddWithValue("@id", item.Id);
-            command.Parameters.AddWithValue("@value", item.Value);
-            command.Parameters.AddWithValue("@time", item.Time);
-
-            command.Prepare();
-            command.ExecuteNonQuery();
-        }
+            id = item.Id,
+            value = item.Value,
+            time = item.Time
+        });
     }
 }

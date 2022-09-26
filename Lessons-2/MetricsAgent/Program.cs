@@ -1,4 +1,7 @@
+using AutoMapper;
 using MetricsAgent.Converters;
+using MetricsAgent.Mapper;
+using MetricsAgent.Models;
 using MetricsAgent.Service;
 using MetricsAgent.Service.Implementations;
 using Microsoft.AspNetCore.HttpLogging;
@@ -11,6 +14,23 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+#region Configure Automapper
+
+var mapperConfiguration = new MapperConfiguration(mapper => mapper.AddProfile(new MapperProfile()));
+var mapper = mapperConfiguration.CreateMapper();
+builder.Services.AddSingleton(mapper);
+
+#endregion
+
+#region Configure Options
+
+builder.Services.Configure<DatabaseOptions>(options =>
+{
+    builder.Configuration.GetSection("Settings:DatabaseOptions").Bind(options);
+});
+
+#endregion
+
 #region Configure DataBase
 
 ConfigureSqlLiteConnection(builder.Services);
@@ -21,7 +41,7 @@ ConfigureSqlLiteConnection(builder.Services);
 
 builder.Services.AddScoped<ICpuMetricsRepository, CpuMetricsRepository>();
 builder.Services.AddScoped<IDotnetMetricsRepository, DotnetMetricsRepository>();
-builder.Services.AddScoped<HddMetricsRepository, HddMetricsRepository>();
+builder.Services.AddScoped<IHddMetricsRepository, HddMetricsRepository>();
 builder.Services.AddScoped<INetworkMetricsRepository, NetworkMetricsRepository>();
 builder.Services.AddScoped<IRamMetricsRepository, RamMetricsRepository>();
 
