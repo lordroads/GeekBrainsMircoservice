@@ -22,8 +22,8 @@ public class NetworkMetricsController : Controller
         _agentRepository = agentRepository;
     }
 
-    [HttpGet("agent/{agentId}/from/{fromTime}/to/{toTime}")]
-    public ActionResult<AllNetworkMetricsApiResponse> GetMetricsFromAgent([FromRoute] int agentId, [FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
+    [HttpGet("get-all-by-id")]
+    public ActionResult<AllNetworkMetricsApiResponse> GetNetworkMetricsFromAgent([FromQuery] int agentId, [FromQuery] TimeSpan fromTime, [FromQuery] TimeSpan toTime)
     {
         AgentInfo agent = _agentRepository.Get(agentId);
 
@@ -51,8 +51,8 @@ public class NetworkMetricsController : Controller
         return Ok(metrics);
     }
 
-    [HttpGet("from/{fromTime}/to/{toTime}")]
-    public ActionResult<IList<AllNetworkMetricsApiResponse>> GetMetricsFromAll([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
+    [HttpGet("get-all")]
+    public ActionResult<IList<AllNetworkMetricsApiResponse>> GetNetworkMetricsFromAll([FromQuery] TimeSpan fromTime, [FromQuery] TimeSpan toTime)
     {
         _logger.LogInformation($"(Network)  starting new request to metrics agent all");
 

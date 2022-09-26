@@ -20,7 +20,7 @@ public class HddMetricsControllerTests
         TimeSpan fromTime = TimeSpan.FromSeconds(0);
         TimeSpan toTime = TimeSpan.FromSeconds(100);
 
-        var result = _hddMetricsController.GetMetricsFromAgent(agentId, fromTime, toTime);
+        var result = _hddMetricsController.GetHddMetricsFromAgent(agentId, fromTime, toTime);
 
         Assert.IsAssignableFrom<IActionResult>(result);
     }
@@ -31,7 +31,7 @@ public class HddMetricsControllerTests
         TimeSpan fromTime = TimeSpan.FromSeconds(0);
         TimeSpan toTime = TimeSpan.FromSeconds(100);
 
-        var result = _hddMetricsController.GetMetricsFromAll(fromTime, toTime);
+        var result = _hddMetricsController.GetHddMetricsFromAll(fromTime, toTime);
 
         Assert.IsAssignableFrom<IActionResult>(result);
     }

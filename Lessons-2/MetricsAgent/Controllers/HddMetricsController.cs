@@ -36,20 +36,15 @@ public class HddMetricsController : Controller
     public ActionResult<AllHddMetricsApiResponse> GetAllMetrics()
     {
         _logger.LogInformation("Get all hdd metrics call. (Internal method.)");
-        return Ok(new AllHddMetricsApiResponse { 
-            Metrics = _hddMetricsRepository.GetAll()
-            .Select(metric => _mapper.Map<HddMetricDto>(metric)).ToList()
-        });
+        return Ok(_mapper.Map<AllHddMetricsApiResponse>(_hddMetricsRepository.GetAll()
+            .Select(metric => _mapper.Map<HddMetricDto>(metric)).ToList()));
     }
 
     [HttpGet("left/from/{fromTime}/to/{toTime}")]
     public ActionResult<AllHddMetricsApiResponse> GetHddMetrics([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
     {
         _logger.LogInformation("Get all hdd metrics call.");
-        return Ok(new AllHddMetricsApiResponse
-        {
-            Metrics = _hddMetricsRepository.GetByTimePeriod(fromTime, toTime)
-            .Select(metric => _mapper.Map<HddMetricDto>(metric)).ToList()
-        });
+        return Ok(_mapper.Map<AllHddMetricsApiResponse>(_hddMetricsRepository.GetByTimePeriod(fromTime, toTime)
+            .Select(metric => _mapper.Map<HddMetricDto>(metric)).ToList()));
     }
 }

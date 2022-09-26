@@ -36,20 +36,15 @@ public class NetworkMetricsController : Controller
     public ActionResult<AllNetworkMetricsApiResponse> GetAllMetrics()
     {
         _logger.LogInformation("Get all network metrics call. (Internal method.)");
-        return Ok(new AllNetworkMetricsApiResponse { 
-            Metrics = _networkMetricsRepository.GetAll()
-            .Select(metric => _mapper.Map<NetworkMetricDto>(metric)).ToList()
-        });
+        return Ok(_mapper.Map<AllNetworkMetricsApiResponse>(_networkMetricsRepository.GetAll()
+            .Select(metric => _mapper.Map<NetworkMetricDto>(metric)).ToList()));
     }
 
     [HttpGet("from/{fromTime}/to/{toTime}/")]
     public ActionResult<AllNetworkMetricsApiResponse> GetNetworkMetrics([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
     {
         _logger.LogInformation("Get all network metrics call.");
-        return Ok(new AllNetworkMetricsApiResponse
-        {
-            Metrics = _networkMetricsRepository.GetByTimePeriod(fromTime, toTime)
-            .Select(metric => _mapper.Map<NetworkMetricDto>(metric)).ToList()
-        });
+        return Ok(_mapper.Map<AllNetworkMetricsApiResponse>(_networkMetricsRepository.GetByTimePeriod(fromTime, toTime)
+            .Select(metric => _mapper.Map<NetworkMetricDto>(metric)).ToList()));
     }
 }

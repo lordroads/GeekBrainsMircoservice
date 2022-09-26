@@ -20,10 +20,8 @@ public class MetricsAgentClient : IMetricsAgentClient
     public AllHddMetricsApiResponse GetHddMetrics(GetAllHddMetricsApiRequest request)
     {
         Uri agentAddress = request.AgentAddress;
-        long fromTime = Convert.ToInt64(request.FromTime.TotalSeconds);
-        long toTime = Convert.ToInt64(request.ToTime.TotalSeconds);
 
-        var httpRequest = new HttpRequestMessage(HttpMethod.Get, $"{agentAddress}api/metrics/hdd/left/from/{fromTime}/to/{toTime}");
+        var httpRequest = new HttpRequestMessage(HttpMethod.Get, $"{agentAddress}api/metrics/hdd/left/from/{request.FromTime}/to/{request.ToTime}");
 
         try
         {
@@ -49,10 +47,8 @@ public class MetricsAgentClient : IMetricsAgentClient
     public AllRamMetricsApiResponse GetRamMetrics(GetAllRamMetricsApiRequest request)
     {
         Uri agentAddress = request.AgentAddress;
-        long fromTime = Convert.ToInt64(request.FromTime.TotalSeconds);
-        long toTime = Convert.ToInt64(request.ToTime.TotalSeconds);
 
-        var httpRequest = new HttpRequestMessage(HttpMethod.Get, $"{agentAddress}api/metrics/ram/available/from/{fromTime}/to/{toTime}");
+        var httpRequest = new HttpRequestMessage(HttpMethod.Get, $"{agentAddress}api/metrics/ram/available/from/{request.FromTime}/to/{request.ToTime}");
 
         try
         {
@@ -78,10 +74,8 @@ public class MetricsAgentClient : IMetricsAgentClient
     public AllCpuMetricsApiResponse GetCpuMetrics(GetAllCpuMetricsApiRequest request)
     {
         Uri agentAddress = request.AgentAddress;
-        long fromTime = Convert.ToInt64(request.FromTime.TotalSeconds);
-        long toTime = Convert.ToInt64(request.ToTime.TotalSeconds);
 
-        var httpRequest = new HttpRequestMessage(HttpMethod.Get, $"{agentAddress}api/metrics/cpu/from/{fromTime}/to/{toTime}");
+        var httpRequest = new HttpRequestMessage(HttpMethod.Get, $"{agentAddress}api/metrics/cpu/from/{request.FromTime}/to/{request.ToTime}");
 
         try
         {
@@ -107,10 +101,8 @@ public class MetricsAgentClient : IMetricsAgentClient
     public AllDotnetMetricsApiResponse GetDotnetMetrics(GetAllDotnetMetricsApiRequest request)
     {
         Uri agentAddress = request.AgentAddress;
-        long fromTime = Convert.ToInt64(request.FromTime.TotalSeconds);
-        long toTime = Convert.ToInt64(request.ToTime.TotalSeconds);
 
-        var httpRequest = new HttpRequestMessage(HttpMethod.Get, $"{agentAddress}api/metrics/dotnet/errors-count/from/{fromTime}/to/{toTime}");
+        var httpRequest = new HttpRequestMessage(HttpMethod.Get, $"{agentAddress}api/metrics/dotnet/errors-count/from/{request.FromTime}/to/{request.ToTime}");
 
         try
         {
@@ -136,10 +128,8 @@ public class MetricsAgentClient : IMetricsAgentClient
     public AllNetworkMetricsApiResponse GetNetworkMetrics(GetAllNetworkMetricsApiRequest request)
     {
         Uri agentAddress = request.AgentAddress;
-        long fromTime = Convert.ToInt64(request.FromTime.TotalSeconds);
-        long toTime = Convert.ToInt64(request.ToTime.TotalSeconds);
 
-        var httpRequest = new HttpRequestMessage(HttpMethod.Get, $"{agentAddress}api/metrics/network/from/{fromTime}/to/{toTime}");
+        var httpRequest = new HttpRequestMessage(HttpMethod.Get, $"{agentAddress}api/metrics/network/from/{request.FromTime}/to/{request.ToTime}");
 
         try
         {

@@ -58,8 +58,8 @@ public class RamMetricsRepository : IRamMetricsRepository
 
         return connection.Query<RamMetric>("SELECT * FROM rammetrics WHERE time >= @fromTime and time <= @toTime", new
         {
-            fromTime = fromTime,
-            toTime = toTime
+            fromTime = fromTime.TotalSeconds,
+            toTime = toTime.TotalSeconds
         }).ToList();
     }
 

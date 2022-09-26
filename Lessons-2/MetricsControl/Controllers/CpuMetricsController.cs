@@ -22,8 +22,8 @@ public class CpuMetricsController : Controller
         _agentRepository = agentRepository;
     }
 
-    [HttpGet("agent/{agentId}/from/{fromTime}/to/{toTime}")]
-    public ActionResult<AllCpuMetricsApiResponse> GetMetricsFromAgent([FromRoute] int agentId, [FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
+    [HttpGet("get-all-by-id")]
+    public ActionResult<AllCpuMetricsApiResponse> GetCpuMetricsFromAgent([FromQuery] int agentId, [FromQuery] TimeSpan fromTime, [FromQuery] TimeSpan toTime)
     {
         AgentInfo agent = _agentRepository.Get(agentId);
 
@@ -51,8 +51,8 @@ public class CpuMetricsController : Controller
         return Ok(metrics);
     }
 
-    [HttpGet("all/from/{fromTime}/to/{toTime}")]
-    public ActionResult<IList<AllCpuMetricsApiResponse>> GetMetricsFromAll([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
+    [HttpGet("get-all")]
+    public ActionResult<IList<AllCpuMetricsApiResponse>> GetCpuMetricsFromAll([FromQuery] TimeSpan fromTime, [FromQuery] TimeSpan toTime)
     {
         _logger.LogInformation($"(CPU)  starting new request to metrics agent all");
 
@@ -91,8 +91,8 @@ public class CpuMetricsController : Controller
         return Ok(allCpuMetricsApiResponses);
     }
 
-    [HttpGet("from/{fromTime}/to/{toTime}/percentiles/{percentile}")]
-    public IActionResult GetMetricsFromAllByPercentile([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime, [FromRoute] int percentile)
+    [HttpGet("get-all-by-percentile")]
+    public IActionResult GetCpuMetricsFromAllByPercentile([FromQuery] TimeSpan fromTime, [FromQuery] TimeSpan toTime, [FromQuery] int percentile)
     {
         return Ok();
     }

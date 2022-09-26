@@ -57,8 +57,8 @@ public class HddMetricsRepository : IHddMetricsRepository
 
         return connection.Query<HddMetric>("SELECT * FROM hddmetrics WHERE time >= @fromTime and time <= @toTime", new
         {
-            fromTime = fromTime,
-            toTime = toTime
+            fromTime = fromTime.TotalSeconds,
+            toTime = toTime.TotalSeconds
         }).ToList();
     }
 
