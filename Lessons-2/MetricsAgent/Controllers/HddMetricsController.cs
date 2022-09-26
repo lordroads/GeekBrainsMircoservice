@@ -2,6 +2,7 @@
 using MetricsAgent.Models;
 using MetricsAgent.Models.Dto;
 using MetricsAgent.Models.Requests;
+using MetricsAgent.Models.Response;
 using MetricsAgent.Service;
 using Microsoft.AspNetCore.Mvc;
 
@@ -32,18 +33,23 @@ public class HddMetricsController : Controller
     }
 
     [HttpGet("all")]
-    public ActionResult<IList<HddMetricDto>> GetAllMetrics()
+    public ActionResult<AllHddMetricsApiResponse> GetAllMetrics()
     {
         _logger.LogInformation("Get all hdd metrics call. (Internal method.)");
-        return Ok(_hddMetricsRepository.GetAll()?
-            .Select(metric => _mapper.Map<HddMetricDto>(metric)).ToList());
+        return Ok(new AllHddMetricsApiResponse { 
+            Metrics = _hddMetricsRepository.GetAll()
+            .Select(metric => _mapper.Map<HddMetricDto>(metric)).ToList()
+        });
     }
 
     [HttpGet("left/from/{fromTime}/to/{toTime}")]
-    public ActionResult<IList<HddMetricDto>> GetHddMetrics([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
+    public ActionResult<AllHddMetricsApiResponse> GetHddMetrics([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
     {
         _logger.LogInformation("Get all hdd metrics call.");
-        return Ok(_hddMetricsRepository.GetByTimePeriod(fromTime, toTime)?
-            .Select(metric => _mapper.Map<HddMetricDto>(metric)).ToList());
+        return Ok(new AllHddMetricsApiResponse
+        {
+            Metrics = _hddMetricsRepository.GetByTimePeriod(fromTime, toTime)
+            .Select(metric => _mapper.Map<HddMetricDto>(metric)).ToList()
+        });
     }
 }

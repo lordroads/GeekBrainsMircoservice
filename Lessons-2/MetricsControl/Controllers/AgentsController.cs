@@ -1,4 +1,6 @@
 ﻿using MetricsControl.Models;
+using MetricsControl.Models.Dto;
+using MetricsControl.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MetricsControl.Controllers
@@ -7,31 +9,47 @@ namespace MetricsControl.Controllers
     [ApiController]
     public class AgentsController : Controller
     {
-        private readonly AgentPool _agentPool;
+        private readonly IAgentRepository _agentsRepository;
+        private readonly ILogger<AgentsController> _logger;
 
-        public AgentsController(AgentPool agentPool)
+        public AgentsController(IAgentRepository agentPool, ILogger<AgentsController> logger)
         {
-            _agentPool = agentPool;
+            _agentsRepository = agentPool;
+            _logger = logger;
         }
 
         [HttpPost]
-        public IActionResult RegisterAgent([FromBody] AgentInfo agentInfo)
+        public IActionResult RegisterAgent([FromBody] AgentInfoDto agentInfo)
         {
+            _logger.LogInformation("Register Agent call.");
+
             if (agentInfo is not null)
             {
-                _agentPool.Add(agentInfo);
+                _agentsRepository.Create(new AgentInfo
+                {
+                    Address = agentInfo.Address.ToString(),
+                    Enable = agentInfo.Enable
+                });
+
+                return Ok();
             }
 
-            return Ok();
+            return BadRequest();
         }
 
         [HttpPut("enable/{agentId}")]
         public IActionResult EnableAgentById([FromRoute] int agentId)
         {
-            if (_agentPool.Agents.ContainsKey(agentId))
-            {
-                _agentPool.Agents[agentId].Enable = true;
-            }
+            _logger.LogInformation("Enable Agent By Id call.");
+
+            AgentInfo agent = _agentsRepository.Get(agentId);
+
+            if (agent == null)
+                return BadRequest();
+
+            agent.Enable = true;
+
+            _agentsRepository.Update(agent);
 
             return Ok();
         }
@@ -39,18 +57,25 @@ namespace MetricsControl.Controllers
         [HttpPut("disable/{agentId}")]
         public IActionResult DisableAgentById([FromRoute] int agentId)
         {
-            if (_agentPool.Agents.ContainsKey(agentId))
-            {
-                _agentPool.Agents[agentId].Enable = false;
-            }
+            _logger.LogInformation("Disable Agent By Id call.");
+
+            AgentInfo agent = _agentsRepository.Get(agentId);
+
+            if (agent == null)
+                return BadRequest();
+
+            agent.Enable = false;
+
+            _agentsRepository.Update(agent);
 
             return Ok();
         }
 
         [HttpGet("get")]
-        public ActionResult<AgentInfo[]> GetAllAgents()
+        public ActionResult<IList<AgentInfo>> GetAllAgents()
         {
-            return Ok(_agentPool.Get());
+            _logger.LogInformation("Get All Agents call.");
+            return Ok(_agentsRepository.GetAll());
         }
     }
 }
